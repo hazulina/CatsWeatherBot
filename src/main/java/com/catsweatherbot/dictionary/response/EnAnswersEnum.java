@@ -1,4 +1,4 @@
-package com.catsweatherbot;
+package com.catsweatherbot.dictionary.response;
 
 import com.catsweatherbot.service.EnumService;
 import lombok.Getter;

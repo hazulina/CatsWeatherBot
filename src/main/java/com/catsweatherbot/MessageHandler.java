@@ -1,6 +1,7 @@
 package com.catsweatherbot;
 
 import com.catsweatherbot.commands.BotReplyKeyboard;
+import com.catsweatherbot.dictionary.response.EnAnswersEnum;
 import com.catsweatherbot.service.BotBackRestService;
 import com.catsweatherbot.service.CommandBackService;
 import com.catsweatherbot.service.EnumService;

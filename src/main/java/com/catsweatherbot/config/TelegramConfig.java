@@ -1,4 +1,4 @@
-package com.catsweatherbot;
+package com.catsweatherbot.config;
 
 import lombok.AccessLevel;
 import lombok.Getter;

@@ -1,6 +1,9 @@
 package com.catsweatherbot;
 
 import com.catsweatherbot.commands.BotReplyKeyboard;
+import com.catsweatherbot.config.TelegramConfig;
+import com.catsweatherbot.dictionary.response.EnAnswersEnum;
+import com.catsweatherbot.dictionary.response.RuAnswersEnum;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

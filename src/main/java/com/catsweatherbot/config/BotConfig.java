@@ -1,5 +1,7 @@
-package com.catsweatherbot;
+package com.catsweatherbot.config;
 
+import com.catsweatherbot.Bot;
+import com.catsweatherbot.MessageHandler;
 import com.catsweatherbot.commands.BotReplyKeyboard;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;

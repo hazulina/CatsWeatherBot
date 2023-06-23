@@ -1,7 +1,7 @@
 package com.catsweatherbot.service;
 
-import com.catsweatherbot.EnAnswersEnum;
-import com.catsweatherbot.RuAnswersEnum;
+import com.catsweatherbot.dictionary.response.EnAnswersEnum;
+import com.catsweatherbot.dictionary.response.RuAnswersEnum;
 
 public interface EnumService {
 
