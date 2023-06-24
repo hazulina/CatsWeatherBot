@@ -28,19 +28,24 @@ public class Bot extends SpringWebhookBot {
     private final MessageHandler messageHandler;
     private final BotReplyKeyboard botReplyKeyboard;
 
-    public Bot(SetWebhook setWebhook, TelegramConfig config, MessageHandler messageHandler, BotReplyKeyboard botReplyKeyboard) {
-        super(setWebhook, config.getBotToken());
-        this.config = config;
-        this.messageHandler = messageHandler;
-        this.botReplyKeyboard = botReplyKeyboard;
+    @Override
+    @SneakyThrows
+    public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
+        if (update.hasCallbackQuery()) {
+            onWebhookCallbackReceived(update.getCallbackQuery());
+        }
+        if (update.getMessage() != null && update.getMessage().hasText()) {
+            String chatId = update.getMessage().getChatId().toString();
+            String userLanguage = messageHandler.getUserLanguage(chatId);
+            if (update.getMessage().isReply()) {
+                System.out.println("It's reply to message " + update.getMessage().getReplyToMessage().getMessageId());
+            } else {
+                handleUpdateWithTextMessage(update, chatId, userLanguage);
+            }
+        }
+        return null;
     }
 
-    public Bot(DefaultBotOptions options, SetWebhook setWebhook, String botToken, TelegramConfig config, MessageHandler messageHandler, BotReplyKeyboard botReplyKeyboard) {
-        super(options, setWebhook, botToken);
-        this.config = config;
-        this.messageHandler = messageHandler;
-        this.botReplyKeyboard = botReplyKeyboard;
-    }
 
     public void onWebhookCallbackReceived(CallbackQuery callbackQuery) {
         String chatId = callbackQuery.getMessage().getChatId().toString();
@@ -52,65 +57,47 @@ public class Bot extends SpringWebhookBot {
         }
     }
 
-    @Override
-    @SneakyThrows
-    public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
-        if (update.hasCallbackQuery()) {
-            onWebhookCallbackReceived(update.getCallbackQuery());
+
+    private void handleUpdateWithTextMessage(Update update, String chatId, String userLanguage) {
+        switch (update.getMessage().getText()) {
+            case "/start":
+                try {
+                    execute(new SendMessage(chatId, messageHandler.handleUpdate(update, chatId, userLanguage)));
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(chooseRightEnumErrorMessage(userLanguage, update.getMessage().getText()));
+                }
+                break;
+            case "/chooselanguage":
+                try {
+                    SendMessage message = new SendMessage(chatId,
+                            chooseRightEnumAnswer(userLanguage, update.getMessage().getText()));
+                    message.setReplyMarkup(botReplyKeyboard.getReplyKeyboardMarkup());
+
+                    execute(message);
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(chooseRightEnumErrorMessage(userLanguage,
+                            update.getMessage().getText()));
+                }
+                break;
+            case "/favouritecity":
+                try {
+                    SendMessage message = new SendMessage(chatId, chooseRightEnumAnswer(userLanguage,
+                            update.getMessage().getText()));
+                    ForceReplyKeyboard forceReplyKeyboard = new ForceReplyKeyboard();
+                    message.setReplyMarkup(forceReplyKeyboard);
+                    execute(message);
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(chooseRightEnumErrorMessage(userLanguage,
+                            update.getMessage().getText()));
+                }
+                break;
+            default:
+                try {
+                    execute(messageHandler.sendPhotoWithWeather(chatId, update.getMessage().getText(), userLanguage));
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(e);
+                }
         }
-//       if(update.getMessage().isReply()){
-            //(update.getMessage().getText());
-//        }
-        if (update.getMessage() != null && update.getMessage().hasText()
-        ) {
-
-            String chatId = update.getMessage().getChatId().toString();
-            String userLanguage = messageHandler.getUserLanguage(chatId);
-            switch (update.getMessage().getText()) {
-                case "/start":
-                    try {
-                        execute(new SendMessage(chatId, messageHandler.handleUpdate(update, chatId, userLanguage)));
-                    } catch (TelegramApiException e) {
-                        throw new RuntimeException(chooseRightEnumErrorMessage(userLanguage, update.getMessage().getText()));
-                    }
-                    break;
-                case "/chooselanguage":
-                    try {
-                        SendMessage message = new SendMessage(chatId,
-                                chooseRightEnumAnswer(userLanguage, update.getMessage().getText()));
-                        message.setReplyMarkup(botReplyKeyboard.getReplyKeyboardMarkup());
-
-                        execute(message);
-                    } catch (TelegramApiException e) {
-                        throw new RuntimeException(chooseRightEnumErrorMessage(userLanguage,
-                                update.getMessage().getText()));
-                    }
-                    break;
-                case "/favouritecity":
-                    try {
-                        SendMessage message = new SendMessage(chatId, chooseRightEnumAnswer(userLanguage,
-                                update.getMessage().getText()));
-                        ForceReplyKeyboard forceReplyKeyboard = new ForceReplyKeyboard();
-                        message.setReplyMarkup(forceReplyKeyboard);
-                        execute(message);
-                    } catch (TelegramApiException e) {
-                        throw new RuntimeException(chooseRightEnumErrorMessage(userLanguage,
-                                update.getMessage().getText()));
-                    }
-                    break;
-                default:
-                    try {
-                        execute(messageHandler.sendPhotoWithWeather(chatId, update.getMessage().getText(), userLanguage));
-                    } catch (TelegramApiException e) {
-                        throw new RuntimeException(e);
-                    }
-            }
-        }
-//        } else {
-//            execute(new SendMessage(chatId, chooseRightWrongInputMessage(userLanguage)));
-//        }
-
-        return null;
     }
 
 
@@ -118,7 +105,7 @@ public class Bot extends SpringWebhookBot {
         return input.matches("^[a-zA-Z/]*$") || input.matches("^[а-яА-Я/]*$");
     }
 
-    public String chooseRightEnumAnswer(String lang, String command) {
+    public String chooseRightEnumAnswer(String lang, String command) {    //need to clean this part
         if ("ru".equals(lang)) {
             return RuAnswersEnum.getEnumByCommandName(command).getCommandReply();
         }
@@ -132,7 +119,7 @@ public class Bot extends SpringWebhookBot {
         return EnAnswersEnum.getEnumByCommandName(command).getCommandErrorMessage();
     }
 
-    private String chooseRightWrongInputMessage(String lang) {
+    private String chooseWrongInputMessage(String lang) {
         if ("ru".equals(lang)) {
             return RuAnswersEnum.WRONG_INPUT.getCommandReply();
         }
@@ -147,5 +134,21 @@ public class Bot extends SpringWebhookBot {
     @Override
     public String getBotUsername() {
         return config.getBotName();
+    }
+
+    public Bot(SetWebhook setWebhook, TelegramConfig config,
+               MessageHandler messageHandler, BotReplyKeyboard botReplyKeyboard) {
+        super(setWebhook, config.getBotToken());
+        this.config = config;
+        this.messageHandler = messageHandler;
+        this.botReplyKeyboard = botReplyKeyboard;
+    }
+
+    public Bot(DefaultBotOptions options, SetWebhook setWebhook, String botToken, TelegramConfig config,
+               MessageHandler messageHandler, BotReplyKeyboard botReplyKeyboard) {
+        super(options, setWebhook, botToken);
+        this.config = config;
+        this.messageHandler = messageHandler;
+        this.botReplyKeyboard = botReplyKeyboard;
     }
 }
