@@ -4,6 +4,7 @@ import com.catsweatherbot.commands.BotReplyKeyboard;
 import com.catsweatherbot.config.TelegramConfig;
 import com.catsweatherbot.dictionary.response.EnAnswersEnum;
 import com.catsweatherbot.dictionary.response.RuAnswersEnum;
+import com.catsweatherbot.service.EnumService;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -51,7 +52,7 @@ public class Bot extends SpringWebhookBot {
         String chatId = callbackQuery.getMessage().getChatId().toString();
         String userLanguage = messageHandler.getUserLanguage(chatId);
         try {
-            execute(new SendMessage(chatId, messageHandler.handleCallback(callbackQuery, userLanguage)));
+            execute(new SendMessage(chatId, messageHandler.handleCallback(callbackQuery, getEnumService(userLanguage))));
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
@@ -62,38 +63,38 @@ public class Bot extends SpringWebhookBot {
         switch (update.getMessage().getText()) {
             case "/start":
                 try {
-                    execute(new SendMessage(chatId, messageHandler.handleUpdate(update, chatId, userLanguage)));
+                    execute(new SendMessage(chatId, messageHandler.handleUpdate(update, chatId, getEnumService(userLanguage))));
                 } catch (TelegramApiException e) {
-                    throw new RuntimeException(chooseRightEnumErrorMessage(userLanguage, update.getMessage().getText()));
+                    throw new RuntimeException(getEnumService(userLanguage).chooseRightEnumErrorMessage(update.getMessage().getText()));
                 }
                 break;
             case "/chooselanguage":
                 try {
                     SendMessage message = new SendMessage(chatId,
-                            chooseRightEnumAnswer(userLanguage, update.getMessage().getText()));
+                            getEnumService(userLanguage).chooseRightEnumAnswer(update.getMessage().getText()));
                     message.setReplyMarkup(botReplyKeyboard.getReplyKeyboardMarkup());
 
                     execute(message);
                 } catch (TelegramApiException e) {
-                    throw new RuntimeException(chooseRightEnumErrorMessage(userLanguage,
-                            update.getMessage().getText()));
+                    throw new RuntimeException(getEnumService(userLanguage)
+                            .chooseRightEnumErrorMessage(update.getMessage().getText()));
                 }
                 break;
             case "/favouritecity":
                 try {
-                    SendMessage message = new SendMessage(chatId, chooseRightEnumAnswer(userLanguage,
-                            update.getMessage().getText()));
+                    SendMessage message = new SendMessage(chatId, getEnumService(userLanguage)
+                            .chooseRightEnumAnswer(update.getMessage().getText()));
                     ForceReplyKeyboard forceReplyKeyboard = new ForceReplyKeyboard();
                     message.setReplyMarkup(forceReplyKeyboard);
                     execute(message);
                 } catch (TelegramApiException e) {
-                    throw new RuntimeException(chooseRightEnumErrorMessage(userLanguage,
-                            update.getMessage().getText()));
+                    throw new RuntimeException(getEnumService(userLanguage)
+                            .chooseRightEnumErrorMessage(update.getMessage().getText()));
                 }
                 break;
             default:
                 try {
-                    execute(messageHandler.sendPhotoWithWeather(chatId, update.getMessage().getText(), userLanguage));
+                    execute(messageHandler.sendPhotoWithWeather(chatId, update.getMessage().getText(), userLanguage, messageHandler.getBotBackRestService()));
                 } catch (TelegramApiException e) {
                     throw new RuntimeException(e);
                 }
@@ -105,26 +106,13 @@ public class Bot extends SpringWebhookBot {
         return input.matches("^[a-zA-Z/]*$") || input.matches("^[а-яА-Я/]*$");
     }
 
-    public String chooseRightEnumAnswer(String lang, String command) {    //need to clean this part
+    private EnumService getEnumService(String lang) {
         if ("ru".equals(lang)) {
-            return RuAnswersEnum.getEnumByCommandName(command).getCommandReply();
+            return RuAnswersEnum.getInstance();
         }
-        return EnAnswersEnum.getEnumByCommandName(command).getCommandReply();
+        return EnAnswersEnum.getInstance();
     }
 
-    public String chooseRightEnumErrorMessage(String lang, String command) {
-        if ("ru".equals(lang)) {
-            return RuAnswersEnum.getEnumByCommandName(command).getCommandErrorMessage();
-        }
-        return EnAnswersEnum.getEnumByCommandName(command).getCommandErrorMessage();
-    }
-
-    private String chooseWrongInputMessage(String lang) {
-        if ("ru".equals(lang)) {
-            return RuAnswersEnum.WRONG_INPUT.getCommandReply();
-        }
-        return EnAnswersEnum.WRONG_INPUT.getCommandReply();
-    }
 
     @Override
     public String getBotPath() {

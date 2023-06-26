@@ -10,8 +10,8 @@ import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 
 @Configuration
 @AllArgsConstructor
-
 public class BotConfig {
+
     private final TelegramConfig telegramConfig;
     private final MessageHandler messageHandler;
     private final BotReplyKeyboard botReplyKeyboard;

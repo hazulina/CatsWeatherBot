@@ -20,7 +20,12 @@ public enum EnAnswersEnum implements EnumService {
     WRONG_INPUT("wrongInput",
             "Wrong Input! Only letters are allowed.",
             "Wrong input! City not found. Try again, please",
-            "");
+            ""),
+    INSTANCE("", "", "", "");
+
+    public static EnumService getInstance() {
+        return INSTANCE;
+    }
 
     private final String commandName;
     private final String commandReply;
@@ -34,13 +39,27 @@ public enum EnAnswersEnum implements EnumService {
         this.commandErrorMessage = commandErrorMessage;
     }
 
+    @Override
+    public String chooseRightEnumAnswer(String command) {
+        return getEnumByCommandName(command).getCommandReply();
+    }
+
+    @Override
+    public String chooseRightEnumErrorMessage(String command) {
+        return getEnumByCommandName(command).getCommandErrorMessage();
+    }
+
+    @Override
+    public String chooseRightAnswerFromBack(String command) {
+        return getEnumByCommandName(command).getCommandBackendReply();
+    }
+
     public static EnAnswersEnum getEnumByCommandName(String commandName) {
         for (EnAnswersEnum command : EnAnswersEnum.values()) {
             if (commandName.equals(command.getCommandName())) {
                 return command;
             }
         }
-        return null;
+        throw new IllegalArgumentException(String.format("WRONG COMMAND INPUT >%s<", commandName));
     }
 }
-

@@ -1,6 +1,5 @@
 package com.catsweatherbot.service;
 
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -37,15 +36,16 @@ public class CommandBackServiceImp implements CommandBackService {
 
     @Override
     public HttpStatusCode updateUserLanguage(String chatId, String language) {
-        Map<String, String> map = new HashMap<>();
-        map.put("chatId", chatId);
-        map.put("userLanguage", language);
         URI url = new UriTemplate(userTableUrl + "/language").expand();
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("chatId", chatId);
+        requestBody.put("userLanguage", language);
         try {
             ResponseEntity<String> response = restTemplate.exchange(
                     url,
                     HttpMethod.PUT,
-                    new HttpEntity<>(map),
+                    new HttpEntity<>(requestBody),
                     String.class
             );
             return response.getStatusCode();
