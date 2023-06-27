@@ -2,6 +2,7 @@ package com.catsweatherbot;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
 import java.math.BigDecimal;
 
 @AllArgsConstructor

@@ -11,21 +11,32 @@ import java.util.List;
 @Component
 @Data
 public class BotReplyKeyboard {
+
     private final InlineKeyboardMarkup replyKeyboardMarkup;
 
     public BotReplyKeyboard() {
-        replyKeyboardMarkup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
-        List<InlineKeyboardButton> row = new ArrayList<>();
-        InlineKeyboardButton en = new InlineKeyboardButton("Eng");
-        en.setCallbackData("en");
-        InlineKeyboardButton ru = new InlineKeyboardButton("Rus");
-        ru.setCallbackData("ru");
-        row.add(en);
-        row.add(ru);
-        keyboard.add(row);
-        replyKeyboardMarkup.setKeyboard(keyboard);
+        replyKeyboardMarkup = createReplyKeyboardMarkup();
     }
 
+    private InlineKeyboardMarkup createReplyKeyboardMarkup() {
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
 
+        List<InlineKeyboardButton> buttons = new ArrayList<>();
+
+        buttons.add(createInlineKeyboardButton("Eng", "en"));
+        buttons.add(createInlineKeyboardButton("Rus", "ru"));
+
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+        keyboard.add(buttons);
+
+        markup.setKeyboard(keyboard);
+
+        return markup;
+    }
+
+    private InlineKeyboardButton createInlineKeyboardButton(String text, String callbackData) {
+        InlineKeyboardButton button = new InlineKeyboardButton(text);
+        button.setCallbackData(callbackData);
+        return button;
+    }
 }

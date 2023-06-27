@@ -20,26 +20,26 @@ import java.util.Random;
 @Data
 @AllArgsConstructor
 public class MessageHandler {
+
     private final BotReplyKeyboard botReplyKeyboard;
     private BotBackRestService botBackRestService;
     private CommandBackService commandBackService;
-    private EnumService enumService;
 
-    public String handleUpdate(Update update, String chatId, String userLanguage) {
-        if (EnAnswersEnum.START.getCommandName().equals(update.getMessage().getText())) { //maybe it is not need at all
+    public String handleUpdate(Update update, String chatId, EnumService enumService) {
+        if (EnAnswersEnum.START.getCommandName().equals(update.getMessage().getText())) {
             if (commandBackService.addUserToBackDb(chatId).is2xxSuccessful()) {
-                enumService.chooseRightEnumAnswer(userLanguage, update.getMessage().getText());
+                return enumService.chooseRightEnumAnswer(update.getMessage().getText());
             }
         }
-        return enumService.chooseRightEnumErrorMessage(userLanguage, update.getMessage().getText());
+        return enumService.chooseRightEnumErrorMessage(update.getMessage().getText());
     }
 
-    public String handleCallback(CallbackQuery query, String userLanguage) {
+    public String handleCallback(CallbackQuery query, EnumService enumService) {
         if (commandBackService
                 .updateUserLanguage(query.getMessage().getChatId().toString(), query.getData()).is2xxSuccessful()) {
-            return enumService.chooseRightAnswerFromBack(query.getData(), "/chooselanguage");
+            return enumService.chooseRightAnswerFromBack("/chooselanguage");
         }
-        return enumService.chooseRightEnumErrorMessage(userLanguage, "/chooselanguage");
+        return enumService.chooseRightEnumErrorMessage("/chooselanguage");
     }
 
     public String getUserLanguage(String chatId) {
@@ -47,10 +47,9 @@ public class MessageHandler {
             commandBackService.addUserToBackDb(chatId);
         }
         return commandBackService.getUserLanguage(chatId);
-
     }
 
-    public SendPhoto sendPhotoWithWeather(String chatId, String text, String userLanguage) {
+    public SendPhoto sendPhotoWithWeather(String chatId, String text, String userLanguage, BotBackRestService botBackRestService) {
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
         sendPhoto.setCaption(botBackRestService.getWeatherFromBackApi(text, userLanguage));
@@ -62,7 +61,6 @@ public class MessageHandler {
         }
         return sendPhoto;
     }
-
 
     private int getRandomNumber(int min, int max) {
         Random random = new Random();

@@ -20,10 +20,14 @@ public enum RuAnswersEnum implements EnumService {
     WRONG_INPUT("wrongInput",
             "Ошибка ввода! Допускаются только буквы :)",
             "Ошибка ввода! Город не найден. Попробуйте снова.",
-            "");
+            ""),
+    INSTANCE("", "", "", "");
+
+    public static EnumService getInstance() {
+        return INSTANCE;
+    }
 
     private final String commandName;
-
     private final String commandReply;
     private final String commandBackendReply;
     private final String commandErrorMessage;
@@ -35,14 +39,27 @@ public enum RuAnswersEnum implements EnumService {
         this.commandErrorMessage = commandErrorMessage;
     }
 
+    @Override
+    public String chooseRightEnumAnswer(String command) {
+        return getEnumByCommandName(command).getCommandReply();
+    }
+
+    @Override
+    public String chooseRightEnumErrorMessage(String command) {
+        return getEnumByCommandName(command).getCommandErrorMessage();
+    }
+
+    @Override
+    public String chooseRightAnswerFromBack(String command) {
+        return getEnumByCommandName(command).getCommandBackendReply();
+    }
+
     public static RuAnswersEnum getEnumByCommandName(String commandName) {
         for (RuAnswersEnum command : RuAnswersEnum.values()) {
             if (commandName.equals(command.getCommandName())) {
                 return command;
             }
         }
-        return null;
+        throw new IllegalArgumentException(String.format("WRONG COMMAND INPUT >%s<", commandName));
     }
-
-
 }
