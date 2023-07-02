@@ -7,13 +7,15 @@ import java.math.BigDecimal;
 
 @AllArgsConstructor
 @Data
-public class WeatherToTg {
+public class WeatherResponseDto {
     private String cityName;
     private String weatherType;
     private String description;
     private BigDecimal temperature;
     private BigDecimal feelsLikeTemp;
     private BigDecimal windSpeed;
+
+    private byte[] pictureFromCloudStorage;
 
 
     public String setPrettyViewForOutputEn() {

@@ -1,7 +1,9 @@
 package com.catsweatherbot.service;
 
+import com.catsweatherbot.WeatherResponseDto;
+
 public interface BotBackRestService {
-    String getWeatherFromBackApi(String input, String userLanguage);
+    WeatherResponseDto getWeatherFromBackApi(String input, String userLanguage);
     // void createUser(String chatId); //when "/start"
 
 

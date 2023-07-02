@@ -13,8 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import java.io.File;
-import java.util.Random;
+import java.io.ByteArrayInputStream;
 
 @Component
 @Data
@@ -50,24 +49,20 @@ public class MessageHandler {
     }
 
     public SendPhoto sendPhotoWithWeather(String chatId, String text, String userLanguage, BotBackRestService botBackRestService) {
+        WeatherResponseDto weatherResponseDto = botBackRestService.getWeatherFromBackApi(text, userLanguage);
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(weatherResponseDto.getPictureFromCloudStorage());
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
-        sendPhoto.setCaption(botBackRestService.getWeatherFromBackApi(text, userLanguage));
         sendPhoto.setParseMode("HTML");
-        if (sendPhoto.getCaption().contains("not found")) {
-            sendPhoto.setPhoto(new InputFile(new File("D:\\picturesForTg\\" + "null" + "\\" + "1.jpg")));
+        sendPhoto.setPhoto(new InputFile(inputStream, "photo"));
+        if("ru".equals(userLanguage)){
+            sendPhoto.setCaption(weatherResponseDto.setPrettyViewForOutputRu());
         } else {
-            sendPhoto.setPhoto(new InputFile(new File("D:\\picturesForTg\\" + "Clear" + "\\" + getRandomNumber(1, 16) + ".jpg")));
+            sendPhoto.setCaption(weatherResponseDto.setPrettyViewForOutputEn());
         }
+        System.out.println(sendPhoto.getCaption());
         return sendPhoto;
     }
 
-    private int getRandomNumber(int min, int max) {
-        Random random = new Random();
-        return random.nextInt(max - min) + min;
-    }
 
-    private String getDirectory(String caption) {
-        return caption.substring(13, caption.indexOf("\n"));
-    }
 }
