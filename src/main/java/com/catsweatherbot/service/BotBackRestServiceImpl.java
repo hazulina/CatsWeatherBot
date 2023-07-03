@@ -10,7 +10,7 @@ import org.springframework.web.util.UriTemplate;
 import java.net.URI;
 
 @Service
-public class BotBackRestServiceImp implements BotBackRestService {
+public class BotBackRestServiceImpl implements BotBackRestService {
     @Value("${weather.request.path}")
     private String weatherUrl;
     private final RestTemplate restTemplate;
@@ -22,7 +22,7 @@ public class BotBackRestServiceImp implements BotBackRestService {
         return response.getBody();
     }
 
-    public BotBackRestServiceImp(RestTemplate restTemplate) {
+    public BotBackRestServiceImpl(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 }
