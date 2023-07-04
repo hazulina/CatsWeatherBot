@@ -1,0 +1,15 @@
+spring.datasource.url=write datasource url for connection here
+spring.datasource.username=write your database username here
+spring.datasource.password=write your database password for connection here
+
+weatherApi.query.url=https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}&units=metric&lang={lang}
+weatherApi.key=write your OpenWeatherMap API key here
+
+s3.credentials.key.id=write here your service account's static key ID
+s3.credentials.key=write here your service account's secret key
+s3.service.endpoint=write your Cloud Object Storage endpoint url here
+s3.signing.region=us-east-1
+s3.query.url=write your bucket name here
+
+
+
