@@ -1,0 +1,7 @@
+server.port=8443
+telegram.webhook-path=write your ngrok webhook here
+telegram.bot-name=write your bot name here (@YourBotName from Telegram's @BotFather)
+telegram.bot-token=write your bot token here (you got it from Telegram's @BotFather)
+
+weather.request.path=http://localhost:8080/api/forecasts/{input}/{userLanguage}
+user.request.path=http://localhost:8080/api/users
