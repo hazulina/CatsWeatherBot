@@ -50,7 +50,7 @@ public class Bot extends SpringWebhookBot {
 
     public void onWebhookCallbackReceived(CallbackQuery callbackQuery) {
         String chatId = callbackQuery.getMessage().getChatId().toString();
-        String userLanguage = messageHandler.getUserLanguage(chatId);
+        String userLanguage = callbackQuery.getData();
         try {
             execute(new SendMessage(chatId, messageHandler.handleCallback(callbackQuery, getEnumService(userLanguage))));
         } catch (TelegramApiException e) {
