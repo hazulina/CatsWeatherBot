@@ -94,7 +94,7 @@ public class Bot extends SpringWebhookBot {
                 break;
             default:
                 try {
-                    execute(messageHandler.sendPhotoWithWeather(chatId, update.getMessage().getText(), userLanguage, messageHandler.getBotBackRestService()));
+                    execute(messageHandler.sendPhotoWithWeather(chatId, update.getMessage().getText(), userLanguage,getEnumService(userLanguage)));
                 } catch (TelegramApiException e) {
                     throw new RuntimeException(e);
                 }

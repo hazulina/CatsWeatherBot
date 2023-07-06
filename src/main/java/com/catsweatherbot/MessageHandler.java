@@ -48,14 +48,18 @@ public class MessageHandler {
         return commandBackService.getUserLanguage(chatId);
     }
 
-    public SendPhoto sendPhotoWithWeather(String chatId, String text, String userLanguage, BotBackRestService botBackRestService) {
+    public SendPhoto sendPhotoWithWeather(String chatId, String text, String userLanguage, EnumService enumService) {
         WeatherResponseDto weatherResponseDto = botBackRestService.getWeatherFromBackApi(text, userLanguage);
         ByteArrayInputStream inputStream = new ByteArrayInputStream(weatherResponseDto.getPictureFromCloudStorage());
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
         sendPhoto.setParseMode("HTML");
         sendPhoto.setPhoto(new InputFile(inputStream, "photo"));
-        if("ru".equals(userLanguage)){
+        if ("null".equals(weatherResponseDto.getWeatherType())) {
+            sendPhoto.setCaption(enumService.chooseRightAnswerFromBack("wrongInput"));
+            return sendPhoto;
+        }
+        if ("ru".equals(userLanguage)) {
             sendPhoto.setCaption(weatherResponseDto.setPrettyViewForOutputRu());
         } else {
             sendPhoto.setCaption(weatherResponseDto.setPrettyViewForOutputEn());
