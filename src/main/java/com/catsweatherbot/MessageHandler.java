@@ -55,7 +55,7 @@ public class MessageHandler {
         sendPhoto.setChatId(chatId);
         sendPhoto.setParseMode("HTML");
         sendPhoto.setPhoto(new InputFile(inputStream, "photo"));
-        if ("null".equals(weatherResponseDto.getWeatherType())) {
+        if ("cityNotFound".equals(weatherResponseDto.getWeatherType())) {
             sendPhoto.setCaption(enumService.chooseRightAnswerFromBack("wrongInput"));
             return sendPhoto;
         }
