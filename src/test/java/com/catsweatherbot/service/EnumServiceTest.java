@@ -10,10 +10,84 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
 class EnumServiceTest {
+
+    @Test
+    void chooseRightEnumAnswerForEnEnum() {
+        List<String> testCommandList = createTestCommandList();
+        List<String> testAnswerList = createTestEnAnswersList();
+        IntStream.range(0, testCommandList.size()).forEach(i -> Assertions.assertEquals(
+                EnAnswersEnum
+                        .getEnumByCommandName(testCommandList.get(i))
+                        .chooseRightEnumAnswer(testCommandList.get(i)),
+                testAnswerList.get(i)
+        ));
+    }
+
+    @Test
+    void chooseRightEnumAnswerForRuEnum() {
+        List<String> testCommandList = createTestCommandList();
+        List<String> testAnswerList = createTestRuAnswersList();
+        IntStream.range(0, testCommandList.size()).forEach(i -> Assertions.assertEquals(
+                RuAnswersEnum
+                        .getEnumByCommandName(testCommandList.get(i))
+                        .chooseRightEnumAnswer(testCommandList.get(i)),
+                testAnswerList.get(i)
+        ));
+    }
+
+    @Test
+    void chooseRightEnumErrorMessageForEnEnum() {
+        List<String> testCommandList = createTestCommandList();
+        List<String> testErrorMessageList = createTestEnErrorMessageList();
+        IntStream.range(0, testCommandList.size()).forEach(i -> Assertions.assertEquals(
+                EnAnswersEnum
+                        .getEnumByCommandName(testCommandList.get(i))
+                        .chooseRightEnumErrorMessage(testCommandList.get(i)),
+                testErrorMessageList.get(i)
+        ));
+    }
+
+    @Test
+    void chooseRightEnumErrorMessageForRuEnum() {
+        List<String> testCommandList = createTestCommandList();
+        List<String> testErrorMessageList = createTestRuErrorMessageList();
+        IntStream.range(0, testCommandList.size()).forEach(i -> Assertions.assertEquals(
+                RuAnswersEnum
+                        .getEnumByCommandName(testCommandList.get(i))
+                        .chooseRightEnumErrorMessage(testCommandList.get(i)),
+                testErrorMessageList.get(i)
+        ));
+    }
+
+    @Test
+    void chooseRightAnswerFromBackForEnEnum() {
+        List<String> testCommandList = createTestCommandList();
+        List<String> testAnswersFromBackList = createTestEnAnswersFromBackList();
+        IntStream.range(0, testCommandList.size()).forEach(i -> Assertions.assertEquals(
+                EnAnswersEnum
+                        .getEnumByCommandName(testCommandList.get(i))
+                        .chooseRightAnswerFromBack(testCommandList.get(i)),
+                testAnswersFromBackList.get(i)
+        ));
+    }
+
+    @Test
+    void chooseRightAnswerFromBackForRuEnum() {
+        List<String> testCommandList = createTestCommandList();
+        List<String> testAnswersFromBackList = createTestRuAnswersFromBackList();
+        IntStream.range(0, testCommandList.size()).forEach(i -> Assertions.assertEquals(
+                RuAnswersEnum
+                        .getEnumByCommandName(testCommandList.get(i))
+                        .chooseRightAnswerFromBack(testCommandList.get(i)),
+                testAnswersFromBackList.get(i)
+        ));
+    }
+
 
     private List<String> createTestCommandList() {
         List<String> testCommandsList = new ArrayList<>();
@@ -42,35 +116,39 @@ class EnumServiceTest {
         return testRuAnswersList;
     }
 
-    @Test
-    void chooseRightEnumAnswerForEnEnum() {
-        List<String> testCommandList = createTestCommandList();
-        List<String> testAnswerList = createTestEnAnswersList();
-        for (int i = 0; i < testCommandList.size(); i++) {
-            Assertions.assertEquals(
-                    EnAnswersEnum.getEnumByCommandName(testCommandList.get(i)).chooseRightEnumAnswer(testCommandList.get(i)),
-                    testAnswerList.get(i)
-            );
-        }
+    private List<String> createTestEnErrorMessageList() {
+        List<String> testEnErrorMessageList = new ArrayList<>();
+        testEnErrorMessageList.add("You've already started me!");
+        testEnErrorMessageList.add("Something suspicious is happen...");
+        testEnErrorMessageList.add("City not found! Maybe it is too small. Choose another one, please");
+        testEnErrorMessageList.add("");
+        return testEnErrorMessageList;
     }
 
-    @Test
-    void chooseRightEnumAnswerForRuEnum() {
-        List<String> testCommandList = createTestCommandList();
-        List<String> testAnswerList = createTestRuAnswersList();
-        for (int i = 0; i < testCommandList.size(); i++) {
-            Assertions.assertEquals(
-                    RuAnswersEnum.getEnumByCommandName(testCommandList.get(i)).chooseRightEnumAnswer(testCommandList.get(i)),
-                    testAnswerList.get(i)
-            );
-        }
+    private List<String> createTestRuErrorMessageList() {
+        List<String> testRuErrorMessageList = new ArrayList<>();
+        testRuErrorMessageList.add("Мы уже начали работу) Давай продолжим");
+        testRuErrorMessageList.add("Случилось неожиданное! Ошибка в установке языка");
+        testRuErrorMessageList.add("Город не найден! Возможно он слишком мал. Выберите другой город рядом с Вами, пожалуйста");
+        testRuErrorMessageList.add("");
+        return testRuErrorMessageList;
     }
 
-    @Test
-    void chooseRightEnumErrorMessage() {
+    private List<String> createTestEnAnswersFromBackList() {
+        List<String> testEnAnswersFromBackList = new ArrayList<>();
+        testEnAnswersFromBackList.add("Nice to meet you. What can I do for you?");
+        testEnAnswersFromBackList.add("Language is set to English");
+        testEnAnswersFromBackList.add("Favourite city is set");
+        testEnAnswersFromBackList.add("Wrong input! City not found. Try again, please");
+        return testEnAnswersFromBackList;
     }
 
-    @Test
-    void chooseRightAnswerFromBack() {
+    private List<String> createTestRuAnswersFromBackList() {
+        List<String> testRuAnswersFromBackList = new ArrayList<>();
+        testRuAnswersFromBackList.add("Теперь мы знакомы, чем могу помочь?");
+        testRuAnswersFromBackList.add("Установлен русский язык");
+        testRuAnswersFromBackList.add("Любимый город установлен");
+        testRuAnswersFromBackList.add("Ошибка ввода! Город не найден. Попробуйте снова.");
+        return testRuAnswersFromBackList;
     }
 }
