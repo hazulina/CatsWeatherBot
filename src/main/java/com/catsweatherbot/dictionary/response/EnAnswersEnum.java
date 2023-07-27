@@ -20,7 +20,7 @@ public enum EnAnswersEnum implements EnumService {
     WRONG_INPUT("wrongInput",
             "Wrong Input! Only letters are allowed.",
             "Wrong input! City not found. Try again, please",
-            ""),
+            "Extremely wrong input)"),
     INSTANCE("", "", "", "");
 
     public static EnumService getInstance() {
