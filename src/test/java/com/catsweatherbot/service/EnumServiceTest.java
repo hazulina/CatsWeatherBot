@@ -4,6 +4,12 @@ import com.catsweatherbot.dictionary.response.EnAnswersEnum;
 import com.catsweatherbot.dictionary.response.RuAnswersEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -11,21 +17,16 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
 class EnumServiceTest {
 
-    @Test
-    void chooseRightEnumAnswerForEnEnum() {
-        List<String> testCommandList = createTestCommandList();
-        List<String> testAnswerList = createTestEnAnswersList();
-        IntStream.range(0, testCommandList.size()).forEach(i -> Assertions.assertEquals(
-                EnAnswersEnum
-                        .getEnumByCommandName(testCommandList.get(i))
-                        .chooseRightEnumAnswer(testCommandList.get(i)),
-                testAnswerList.get(i)
-        ));
+    @ParameterizedTest
+    @ArgumentsSource(EnEnumArgsProvider.class)
+    void chooseRightEnumAnswerForEnEnum(String testAnswer, EnAnswersEnum enAnswersEnum) {
+        Assertions.assertEquals(testAnswer,enAnswersEnum.chooseRightEnumAnswer(enAnswersEnum.getCommandName()));
     }
 
     @Test
@@ -150,5 +151,16 @@ class EnumServiceTest {
         testRuAnswersFromBackList.add("Любимый город установлен");
         testRuAnswersFromBackList.add("Ошибка ввода! Город не найден. Попробуйте снова.");
         return testRuAnswersFromBackList;
+    }
+
+    static class EnEnumArgsProvider implements ArgumentsProvider {
+        @Override
+        public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
+            return Stream.of(
+                    Arguments.of("Hi, I'm Cats & Weather Bot!", EnAnswersEnum.START),
+                    Arguments.of("What language should be set?", EnAnswersEnum.LANGUAGE),
+                    Arguments.of("Send me city's name which weather you'd like to get every day", EnAnswersEnum.FAVOURITE_CITY),
+                    Arguments.of("Wrong Input! Only letters are allowed.", EnAnswersEnum.WRONG_INPUT));
+        }
     }
 }
